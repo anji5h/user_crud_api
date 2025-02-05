@@ -9,6 +9,38 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  name       String    @db.VarChar(50)
+  password   String    @db.LongText
+  isBanned   Boolean   @default(false)
+  otp        Int       @default(0)
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  role       Role      @relation(fields: [roleId], references: [id])
+  roleId     Int
+  token      Token?     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  tokenId    Int?
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  users     User[]
 }
