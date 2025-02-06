@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { scrypt, randomBytes } from 'crypto';
 
 @Injectable()
-export class HasherService {
+export class HashService {
   private readonly keyLength = 64;
 
   constructor() {}
 
-  public async hashPassword(password: string) {
+  async hashPassword(password: string) {
     const salt = randomBytes(16).toString('hex');
 
     const derivedKey: Buffer = await new Promise((resolve, reject) => {
@@ -20,7 +20,7 @@ export class HasherService {
     return `${salt}:${derivedKey.toString('hex')}`;
   }
 
-  public async verifyPassword(password: string, hash: string) {
+  async verifyPassword(password: string, hash: string) {
     const [salt, key] = hash.split(':');
 
     const derivedKey: Buffer = await new Promise((resolve, reject) => {

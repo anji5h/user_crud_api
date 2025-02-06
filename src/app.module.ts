@@ -1,13 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { SeederModule } from './seeders/seeders.module';
-import { HasherService } from './services/hasher/hasher.service';
-import { PrismaService } from './services/prisma/prisma.service';
+import { SeedModule } from './modules/seed/seed.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { validate } from './validations/env.validation';
+import { DatabaseModule } from './modules/database/database.module';
+import { HashModule } from './modules/hash/hash.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), SeederModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({
+      validate,
+    }),
+    SeedModule,
+    AuthModule,
+    DatabaseModule,
+    HashModule,
+  ],
   controllers: [],
-  providers: [HasherService, PrismaService],
+  providers: [],
 })
 export class AppModule {}
