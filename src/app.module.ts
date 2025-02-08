@@ -5,6 +5,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { validate } from './validations/env.validation';
 import { DatabaseModule } from './modules/database/database.module';
 import { HashModule } from './modules/hash/hash.module';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 @Module({
   imports: [
@@ -17,6 +19,11 @@ import { HashModule } from './modules/hash/hash.module';
     HashModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

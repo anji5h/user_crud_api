@@ -11,6 +11,8 @@ async function bootstrap() {
     }),
   });
 
+  const apiPath = "/api/v1"
+
   const seederService = app.get(SeedService);
   await seederService.run();
 
@@ -21,7 +23,9 @@ async function bootstrap() {
     .addTag('user')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup(`${apiPath}/docs`, app, documentFactory);
+
+  app.setGlobalPrefix(apiPath)
 
   await app.listen(process.env.PORT ?? 3000);
 }
