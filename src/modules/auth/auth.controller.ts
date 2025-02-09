@@ -6,10 +6,10 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { loginRequestDto } from './dto/loginRequestDto';
+import { loginRequestDto } from './dto/login-request.dto';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
-import { loginResponseDto } from './dto/loginResponseDto';
+import { loginResponseDto } from './dto/login-response.dto';
 import { Response } from 'express';
 
 @Controller('auth')

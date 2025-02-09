@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HashService } from 'src/modules/hash/hash.service';
 import { DatabaseService } from '../database/database.service';
-import { IEnvConfig } from 'src/common/types/envConfig';
+import { IConfig } from 'src/common/types/config.type';
 
 @Injectable()
 export class SeedService {
@@ -10,7 +10,7 @@ export class SeedService {
 
   constructor(
     private readonly dbService: DatabaseService,
-    private readonly configService: ConfigService<IEnvConfig>,
+    private readonly configService: ConfigService<IConfig>,
     private readonly hashService: HashService,
   ) {}
 

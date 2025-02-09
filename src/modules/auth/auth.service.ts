@@ -1,13 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { loginRequestDto } from './dto/loginRequestDto';
+import { loginRequestDto } from './dto/login-request.dto';
 import { HashService } from '../hash/hash.service';
 import { DatabaseService } from '../database/database.service';
 import { JwtService } from '@nestjs/jwt';
 import { nanoid } from 'nanoid';
 import { ConfigService } from '@nestjs/config';
-import { IEnvConfig } from 'src/common/types/envConfig';
+import { IConfig } from 'src/common/types/config.type';
 import { TokenService } from '../token/token.service';
-import { jwtPayload } from 'src/common/types/jwtPayload';
+import { jwtPayload } from 'src/common/types/jwt-payload.type';
+import { registerRequestDto } from './dto/register-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,9 +16,23 @@ export class AuthService {
     private readonly hashService: HashService,
     private readonly dbService: DatabaseService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService<IEnvConfig>,
+    private readonly configService: ConfigService<IConfig>,
     private readonly tokenService: TokenService,
   ) {}
+
+  async registerAsync(registerDto: registerRequestDto) {
+    const hashedPassword = await this.hashService.hashPassword(
+      registerDto.password,
+    );
+    await this.dbService.user.create({
+      data: {
+        name: registerDto.name,
+        password: hashedPassword,
+        email: registerDto.email,
+        roleId: 1
+      },
+    });
+  }
 
   async loginAsync(loginDto: loginRequestDto) {
     const user = await this.dbService.user.findUnique({

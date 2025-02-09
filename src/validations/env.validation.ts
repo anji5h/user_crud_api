@@ -1,8 +1,8 @@
 import { plainToInstance } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, validateSync } from 'class-validator';
-import { Environment, IEnvConfig } from 'src/common/types/envConfig';
+import { Environment, IConfig } from 'src/common/types/config.type';
 
-class EnvironmentVariables implements IEnvConfig {
+class EnvironmentVariables implements IConfig {
   @IsEnum(Environment)
   NODE_ENV: Environment;
 

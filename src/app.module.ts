@@ -5,11 +5,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import { validate } from './validations/env.validation';
 import { DatabaseModule } from './modules/database/database.module';
 import { HashModule } from './modules/hash/hash.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { JwtModule } from '@nestjs/jwt';
 import { TokenModule } from './modules/token/token.module';
-import { IEnvConfig } from './common/types/envConfig';
+import { IConfig } from './common/types/config.type';
+import { AuthGuard } from './common/guards/auth.guard';
+import { RolesGuard } from './common/guards/role.guard';
+import { RoleModule } from './modules/role/role.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -20,7 +24,7 @@ import { IEnvConfig } from './common/types/envConfig';
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService<IEnvConfig>) => ({
+      useFactory: async (configService: ConfigService<IConfig>) => ({
         signOptions: {
           expiresIn: configService.get('ACCESS_TOKEN_EXPIRE'),
         },
@@ -34,12 +38,22 @@ import { IEnvConfig } from './common/types/envConfig';
     DatabaseModule,
     HashModule,
     TokenModule,
+    RoleModule,
+    UserModule,
   ],
   controllers: [],
   providers: [
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

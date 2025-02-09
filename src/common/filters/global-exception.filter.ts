@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { errorResponseDto } from '../dto/responseDto';
+import { errorResponseDto } from '../dto/response.dto';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

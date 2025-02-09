@@ -5,7 +5,7 @@ export enum Environment {
   Provision = 'provision',
 }
 
-export interface IEnvConfig {
+export interface IConfig {
   NODE_ENV: Environment;
   PORT: number;
   ADMIN_NAME: string;
