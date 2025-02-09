@@ -1,19 +1,8 @@
 import { plainToInstance } from 'class-transformer';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  validateSync,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, validateSync } from 'class-validator';
+import { Environment, IEnvConfig } from 'src/common/types/envConfig';
 
-enum Environment {
-  Development = 'development',
-  Production = 'production',
-  Test = 'test',
-  Provision = 'provision',
-}
-
-class EnvironmentVariables {
+class EnvironmentVariables implements IEnvConfig {
   @IsEnum(Environment)
   NODE_ENV: Environment;
 
@@ -21,13 +10,25 @@ class EnvironmentVariables {
   PORT: number;
 
   @IsNotEmpty()
-  ADMIN_NAME: string
+  ADMIN_NAME: string;
 
   @IsNotEmpty()
-  ADMIN_EMAIL: string
+  ADMIN_EMAIL: string;
 
   @IsNotEmpty()
-  ADMIN_PASSWORD: string
+  ADMIN_PASSWORD: string;
+
+  @IsNotEmpty()
+  ACCESS_TOKEN_SECRET: string;
+
+  @IsNotEmpty()
+  ACCESS_TOKEN_EXPIRE: number;
+
+  @IsNotEmpty()
+  REFRESH_TOKEN_EXPIRE: number;
+
+  @IsNotEmpty()
+  DATABASE_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {

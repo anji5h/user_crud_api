@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HashService } from 'src/modules/hash/hash.service';
 import { DatabaseService } from '../database/database.service';
+import { IEnvConfig } from 'src/common/types/envConfig';
 
 @Injectable()
 export class SeedService {
@@ -9,7 +10,7 @@ export class SeedService {
 
   constructor(
     private readonly dbService: DatabaseService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<IEnvConfig>,
     private readonly hashService: HashService,
   ) {}
 
@@ -45,10 +46,10 @@ export class SeedService {
         email: this.configService.get<string>('ADMIN_EMAIL') ?? '',
         password: hashedPassword,
         roleId: adminRole?.id,
-        verifiedAt: new Date()
+        verifiedAt: new Date(),
       },
     });
 
-    this.logger.verbose("Database seeded.")
+    this.logger.verbose('Database seeded.');
   }
 }

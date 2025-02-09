@@ -25,8 +25,7 @@ model User {
   updatedAt  DateTime  @updatedAt
   role       Role      @relation(fields: [roleId], references: [id])
   roleId     Int
-  token      Token?     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
-  tokenId    Int?
+  token      Token[]
 }
 
 model Role {
@@ -42,5 +41,6 @@ model Token {
   token     String   @unique
   createdAt DateTime @default(now())
   expiresAt DateTime
-  users     User[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
 }

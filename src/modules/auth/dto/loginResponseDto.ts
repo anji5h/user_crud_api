@@ -3,6 +3,9 @@ import { responseDto } from 'src/common/dto/responseDto';
 
 class User {
   @ApiProperty()
+  id: number;
+
+  @ApiProperty()
   name: string;
 
   @ApiProperty()
@@ -19,10 +22,7 @@ class loginResponse {
   user: User;
 
   @ApiProperty()
-  refreshToken: string;
-
-  @ApiProperty()
-  accessToken: string;
+  token: string;
 }
 
 export class loginResponseDto extends responseDto<loginResponse> {
