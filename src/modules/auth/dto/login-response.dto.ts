@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { responseDto } from 'src/common/dto/response.dto';
+import { ResponseDto } from 'src/common/dto/response.dto';
 
 class User {
   @ApiProperty()
@@ -15,7 +15,7 @@ class User {
   role: string;
 }
 
-class loginResponse {
+class LoginResponse {
   @ApiProperty({
     type: User,
   })
@@ -25,9 +25,9 @@ class loginResponse {
   token: string;
 }
 
-export class loginResponseDto extends responseDto<loginResponse> {
+export class LoginResponseDto extends ResponseDto<LoginResponse> {
   @ApiProperty({
-    type: loginResponse,
+    type: LoginResponse,
   })
-  data: loginResponse;
+  data: LoginResponse;
 }

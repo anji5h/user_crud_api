@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { responseDto } from 'src/common/dto/response.dto';
+import { ResponseDto } from 'src/common/dto/response.dto';
 
-export class RegisterResponseDto extends responseDto<null> {
+export class RegisterResponseDto extends ResponseDto<null> {
   @ApiProperty()
   data: null;
 }

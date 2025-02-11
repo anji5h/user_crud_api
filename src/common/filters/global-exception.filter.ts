@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { errorResponseDto } from '../dto/response.dto';
+import { ErrorResponseDto } from '../dto/response.dto';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -24,7 +24,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const responseBody = new errorResponseDto();
+    const responseBody = new ErrorResponseDto();
     responseBody.message = exception?.message || 'Internal server error';
     responseBody.statusCode = httpStatus;
 

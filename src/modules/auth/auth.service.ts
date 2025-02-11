@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { loginRequestDto } from './dto/login-request.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
 import { HashService } from '../hash/hash.service';
 import { DatabaseService } from '../database/database.service';
 import { SessionService } from '../token/session.service';
@@ -33,7 +33,7 @@ export class AuthService {
     });
   }
 
-  async loginAsync(loginDto: loginRequestDto, userAgent: UAParser.IResult) {
+  async loginAsync(loginDto: LoginRequestDto, userAgent: UAParser.IResult) {
     const user = await this.dbService.user.findUnique({
       where: {
         email: loginDto.email,

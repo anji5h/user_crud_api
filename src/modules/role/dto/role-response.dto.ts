@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { responseDto } from 'src/common/dto/response.dto';
+import { ResponseDto } from 'src/common/dto/response.dto';
 
 export class Role {
   @ApiProperty()
@@ -15,7 +15,7 @@ export class Role {
   updatedAt: Date;
 }
 
-export class rolesResponseDto extends responseDto<Role[]> {
+export class RolesResponseDto extends ResponseDto<Role[]> {
   @ApiProperty({
     type: [Role],
   })

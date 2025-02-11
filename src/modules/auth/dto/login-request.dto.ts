@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty} from 'class-validator';
 
-export class loginRequestDto {
+export class LoginRequestDto {
   @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
