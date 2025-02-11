@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { Prisma } from '@prisma/client';
+import { Role } from 'src/common/decorators/role.decorator';
 
 @Injectable()
+@Role('user')
 export class RoleService {
   constructor(private readonly dbService: DatabaseService) {}
 
@@ -35,7 +37,7 @@ export class RoleService {
   }
 
   async updateRoleAsync(id: number, name: string) {
-    await this.dbService.role.update({
+    const roleUpdated = await this.dbService.role.update({
       where: {
         id,
       },

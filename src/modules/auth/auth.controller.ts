@@ -4,13 +4,17 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
 } from '@nestjs/common';
 import { loginRequestDto } from './dto/login-request.dto';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { loginResponseDto } from './dto/login-response.dto';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
+import { RegisterRequestDto } from './dto/register-request.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { UAParser } from 'ua-parser-js';
 
 @Controller('auth')
 export class AuthController {
@@ -18,26 +22,38 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiBody({
-    type: loginRequestDto,
-  })
-  @ApiResponse({
-    type: loginResponseDto,
-  })
-  async login(@Body() requestDto: loginRequestDto, @Res() response: Response) {
-    const payload = await this.authService.loginAsync(requestDto);
+  @ApiBody({ type: loginRequestDto })
+  @ApiResponse({ type: loginResponseDto })
+  async login(
+    @Body() loginDto: loginRequestDto,
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    const userAgent = UAParser(request.headers['user-agent']);
 
-    const reply = new loginResponseDto();
-    reply.statusCode = HttpStatus.OK;
-    reply.message = 'success';
-    reply.data = {
-      user: payload.user,
-      token: payload.accessToken,
-    };
+    const { user, token, sessionId, sessionExpiresAt } =
+      await this.authService.loginAsync(loginDto, userAgent);
 
-    return response.json(reply).cookie('refresh_token', payload.refreshToken, {
-      httpOnly: true,
-      
+    const cookieOptions: CookieOptions = loginDto.remember
+      ? { expires: sessionExpiresAt, httpOnly: true }
+      : { httpOnly: true };
+
+    return response.cookie('session_id', sessionId, cookieOptions).json({
+      statusCode: HttpStatus.OK,
+      message: 'success',
+      data: { user, token: token },
     });
+  }
+
+  @Post('register')
+  @HttpCode(200)
+  @ApiBody({ type: RegisterRequestDto })
+  @ApiResponse({ type: RegisterResponseDto })
+  async registerAsync(@Body() registerDto: RegisterRequestDto) {
+    await this.authService.registerAsync(registerDto);
+
+    const response = new RegisterResponseDto();
+    response.statusCode = 201;
+    response.message = 'success';
   }
 }

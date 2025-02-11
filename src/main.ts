@@ -11,7 +11,7 @@ async function bootstrap() {
     }),
   });
 
-  const apiPath = "/api/v1"
+  const apiPath = '/api/v1';
 
   const seederService = app.get(SeedService);
   await seederService.run();
@@ -21,12 +21,16 @@ async function bootstrap() {
     .setDescription('USER CRUD API')
     .setVersion('1.0')
     .addTag('user')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'JWT',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`${apiPath}/docs`, app, documentFactory);
 
-  app.setGlobalPrefix(apiPath)
+  app.setGlobalPrefix(apiPath);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 bootstrap();

@@ -10,8 +10,14 @@ export class Role {
 
   @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
 }
 
 export class rolesResponseDto extends responseDto<Role[]> {
+  @ApiProperty({
+    type: [Role],
+  })
   data?: Role[];
 }

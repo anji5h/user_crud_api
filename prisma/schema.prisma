@@ -25,7 +25,7 @@ model User {
   updatedAt  DateTime  @updatedAt
   role       Role      @relation(fields: [roleId], references: [id])
   roleId     Int
-  token      Token[]
+  session    Session[]
 }
 
 model Role {
@@ -36,11 +36,13 @@ model Role {
   users     User[]
 }
 
-model Token {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
+model Session {
+  id        String   @id
+  device    String?
   createdAt DateTime @default(now())
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
+
+  @@unique([userId, device])
 }
