@@ -17,11 +17,11 @@ export class RolesGuard implements CanActivate {
     if (!role) return true;
 
     const request = context.switchToHttp().getRequest();
-    const user = request.userRole;
+    const user = request.user;
 
     if (!user) throw new UnauthorizedException('Permission denied.');
 
-    if (user.role !== role) {
+    if (user.userRole !== role) {
       throw new UnauthorizedException('Permission denied.');
     }
 
