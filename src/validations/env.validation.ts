@@ -19,13 +19,13 @@ class EnvironmentVariables implements IConfig {
   ADMIN_PASSWORD: string;
 
   @IsNotEmpty()
-  ACCESS_TOKEN_SECRET: string;
+  TOKEN_SECRET: string;
 
   @IsNotEmpty()
-  ACCESS_TOKEN_EXPIRE: number;
+  TOKEN_EXPIRE: number;
 
   @IsNotEmpty()
-  REFRESH_TOKEN_EXPIRE: number;
+  SESSION_EXPIRE: number;
 
   @IsNotEmpty()
   DATABASE_URL: string;

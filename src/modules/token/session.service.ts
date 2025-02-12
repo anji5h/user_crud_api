@@ -1,59 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { ConfigService } from '@nestjs/config';
-import { IConfig } from 'src/common/types/config.type';
-import { jwtPayload } from 'src/common/types/jwt-payload.type';
-import { JwtService } from '@nestjs/jwt';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class SessionService {
-  constructor(
-    private readonly dbService: DatabaseService,
-    private readonly configService: ConfigService<IConfig>,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly dbService: DatabaseService) {}
 
-  async getTokenAsync(sessionId: string) {
-    const refreshToken = await this.dbService.session.findUnique({
+  async getSessionsAsync() {
+    const sessions = await this.dbService.session.findMany({
       where: {
-        id: sessionId,
+        expiresAt: {
+          lt: new Date(),
+        },
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    return refreshToken;
+    return sessions;
   }
 
-  async createTokenAsync(
-    payload: jwtPayload,
-    device: string,
-    remember: boolean,
-  ) {
-    const token = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get('ACCESS_TOKEN_SECRET'),
-    });
-
-    const sessionExpiresAt = remember
-      ? new Date(
-          Date.now() + this.configService.get('REFRESH_TOKEN_EXPIRE') * 1000,
-        )
-      : new Date(Date.now() + 86400 * 1000);
-
-    await this.dbService.session.create({
+  async createSessionAsync(userId: number, device: string, expiresAt: Date) {
+    const id = nanoid(32);
+    const session = await this.dbService.session.create({
       data: {
-        id: payload.sessionId,
-        userId: payload.userId,
+        id,
+        userId,
         device,
-        expiresAt: sessionExpiresAt,
+        expiresAt,
       },
     });
 
-    return {
-      sessionId: payload.sessionId,
-      sessionExpiresAt,
-      token,
-    };
+    return session.id;
   }
 }

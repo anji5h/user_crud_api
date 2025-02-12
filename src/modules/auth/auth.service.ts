@@ -4,8 +4,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { nanoid } from 'nanoid';
-import UAParser from 'ua-parser-js';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { IConfig } from 'src/common/types/config.type';
+import { IJwtPayload } from 'src/common/types/jwt-payload.type';
+import { IResult } from 'ua-parser-js';
 import { DatabaseService } from '../database/database.service';
 import { HashService } from '../hash/hash.service';
 import { RoleService } from '../role/role.service';
@@ -20,6 +23,8 @@ export class AuthService {
     private readonly dbService: DatabaseService,
     private readonly sessionService: SessionService,
     private readonly roleService: RoleService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService<IConfig>,
   ) {}
 
   async registerAsync(registerDto: RegisterRequestDto) {
@@ -41,7 +46,7 @@ export class AuthService {
     });
   }
 
-  async loginAsync(loginDto: LoginRequestDto, userAgent: UAParser.IResult) {
+  async loginAsync(loginDto: LoginRequestDto, userAgent: IResult) {
     const user = await this.dbService.user.findUnique({
       where: {
         email: loginDto.email,
@@ -66,18 +71,23 @@ export class AuthService {
     if (!isPasswordVerified)
       throw new UnauthorizedException('Invalid email or password');
 
-    const userDevice = `${userAgent.device?.model || userAgent.os?.name || 'unknown'}|${userAgent.browser?.name}`;
+    const userDevice = this.getUserDevice(userAgent);
 
-    const { sessionId, sessionExpiresAt, token } =
-      await this.sessionService.createTokenAsync(
-        {
-          userId: user.id,
-          userRole: user.role.name,
-          sessionId: nanoid(32),
-        },
-        userDevice,
-        loginDto.remember,
-      );
+    const sessionExpiresAt = loginDto.remember
+      ? new Date(Date.now() + this.configService.get('SESSION_EXPIRE') * 1000)
+      : new Date(Date.now() + 86400 * 1000);
+
+    const sessionId = await this.sessionService.createSessionAsync(
+      user.id,
+      userDevice,
+      sessionExpiresAt,
+    );
+
+    const token = await this.createJwtTokenAsync({
+      userId: user.id,
+      userRole: user.role.name,
+      sessionId,
+    });
 
     return {
       user: {
@@ -90,5 +100,17 @@ export class AuthService {
       sessionId,
       sessionExpiresAt,
     };
+  }
+
+  private async createJwtTokenAsync(payload: IJwtPayload) {
+    const token = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('TOKEN_SECRET'),
+    });
+
+    return token;
+  }
+
+  private getUserDevice(userAgent: IResult) {
+    return `${userAgent.device?.model || userAgent.os?.name || 'unknown'}|${userAgent.browser?.name}`;
   }
 }

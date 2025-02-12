@@ -11,8 +11,8 @@ export interface IConfig {
   ADMIN_NAME: string;
   ADMIN_EMAIL: string;
   ADMIN_PASSWORD: string;
-  ACCESS_TOKEN_SECRET: string;
-  ACCESS_TOKEN_EXPIRE: number;
-  REFRESH_TOKEN_EXPIRE: number;
+  TOKEN_SECRET: string;
+  TOKEN_EXPIRE: number;
+  SESSION_EXPIRE: number;
   DATABASE_URL: string;
 }

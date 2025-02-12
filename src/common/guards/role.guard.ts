@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '../decorators/role.decorator';
-import { jwtPayload } from '../types/jwt-payload.type';
+import { IJwtPayload } from '../types/jwt-payload.type';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -18,7 +18,7 @@ export class RoleGuard implements CanActivate {
     if (!role) return true;
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user as jwtPayload;
+    const user = request.user as IJwtPayload;
 
     if (!user) throw new ForbiddenException('PERMISSION_DENIED');
 

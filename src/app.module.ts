@@ -26,7 +26,7 @@ import { AuthGuard } from './common/guards/auth.guard';
       inject: [ConfigService],
       useFactory: (configService: ConfigService<IConfig>) => ({
         signOptions: {
-          expiresIn: configService.get('ACCESS_TOKEN_EXPIRE'),
+          expiresIn: configService.get('TOKEN_EXPIRE'),
         },
         verifyOptions: {
           ignoreExpiration: false,

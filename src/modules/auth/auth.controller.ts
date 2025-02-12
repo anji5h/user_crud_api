@@ -34,15 +34,16 @@ export class AuthController {
     const { user, token, sessionId, sessionExpiresAt } =
       await this.authService.loginAsync(loginDto, userAgent);
 
-    const cookieOptions: CookieOptions = loginDto.remember
-      ? { expires: sessionExpiresAt, httpOnly: true }
-      : { httpOnly: true };
-
-    return response.cookie('session_id', sessionId, cookieOptions).json({
-      statusCode: HttpStatus.OK,
-      message: 'SUCCESS',
-      data: { user, token: token },
-    });
+    return response
+      .cookie('session_id', sessionId, {
+        expires: sessionExpiresAt,
+        httpOnly: true,
+      })
+      .json({
+        statusCode: HttpStatus.OK,
+        message: 'SUCCESS',
+        data: { user, token: token },
+      });
   }
 
   @Post('register')
