@@ -40,7 +40,7 @@ export class AuthController {
 
     return response.cookie('session_id', sessionId, cookieOptions).json({
       statusCode: HttpStatus.OK,
-      message: 'success',
+      message: 'SUCCESS',
       data: { user, token: token },
     });
   }
@@ -54,6 +54,6 @@ export class AuthController {
 
     const response = new RegisterResponseDto();
     response.statusCode = 201;
-    response.message = 'success';
+    response.message = 'SUCCESS';
   }
 }

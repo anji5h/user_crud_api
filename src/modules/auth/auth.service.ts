@@ -1,15 +1,17 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginRequestDto } from './dto/login-request.dto';
-import { HashService } from '../hash/hash.service';
-import { DatabaseService } from '../database/database.service';
-import { SessionService } from '../token/session.service';
-import { RegisterRequestDto } from './dto/register-request.dto';
 import { nanoid } from 'nanoid';
 import UAParser from 'ua-parser-js';
+import { DatabaseService } from '../database/database.service';
+import { HashService } from '../hash/hash.service';
+import { RoleService } from '../role/role.service';
+import { SessionService } from '../token/session.service';
+import { LoginRequestDto } from './dto/login-request.dto';
+import { RegisterRequestDto } from './dto/register-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,18 +19,24 @@ export class AuthService {
     private readonly hashService: HashService,
     private readonly dbService: DatabaseService,
     private readonly sessionService: SessionService,
+    private readonly roleService: RoleService,
   ) {}
 
   async registerAsync(registerDto: RegisterRequestDto) {
     const hashedPassword = await this.hashService.hashPassword(
       registerDto.password,
     );
+
+    const userRole = await this.roleService.getRoleAsync('user');
+
+    if (!userRole) throw new BadRequestException('REGISTRATION FAILED');
+
     await this.dbService.user.create({
       data: {
         name: registerDto.name,
         password: hashedPassword,
         email: registerDto.email,
-        roleId: 1,
+        roleId: userRole?.id,
       },
     });
   }

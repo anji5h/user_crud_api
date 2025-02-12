@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { Prisma } from '@prisma/client';
 import { Role } from 'src/common/decorators/role.decorator';
 
 @Injectable()
@@ -28,9 +27,11 @@ export class RoleService {
     return roles;
   }
 
-  async getRoleAsync(filter: Prisma.RoleWhereUniqueInput) {
+  async getRoleAsync(name: string) {
     const role = await this.dbService.role.findUnique({
-      where: filter,
+      where: {
+        name,
+      },
     });
 
     return role;

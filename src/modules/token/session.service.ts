@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { nanoid } from 'nanoid';
 import { ConfigService } from '@nestjs/config';
 import { IConfig } from 'src/common/types/config.type';
 import { jwtPayload } from 'src/common/types/jwt-payload.type';

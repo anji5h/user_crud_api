@@ -19,7 +19,7 @@ export class RoleController {
     const roles = await this.roleService.getRolesAsync();
 
     const response = new RolesResponseDto();
-    response.message = 'success';
+    response.message = 'SUCCESS';
     response.statusCode = 200;
     response.data = roles;
 
@@ -27,7 +27,5 @@ export class RoleController {
   }
 
   @Post()
-  async createRoleAsync(){
-
-  }
+  async createRoleAsync() {}
 }

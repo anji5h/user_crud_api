@@ -34,7 +34,7 @@ export class SeedService {
       },
     });
 
-    if (!!adminUser) return;
+    if (adminUser) return;
 
     const hashedPassword = await this.hashService.hashPassword(
       this.configService.get<string>('ADMIN_PASSWORD') ?? '',

@@ -24,7 +24,7 @@ import { AuthGuard } from './common/guards/auth.guard';
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService<IConfig>) => ({
+      useFactory: (configService: ConfigService<IConfig>) => ({
         signOptions: {
           expiresIn: configService.get('ACCESS_TOKEN_EXPIRE'),
         },
