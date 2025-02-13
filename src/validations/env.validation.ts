@@ -29,6 +29,24 @@ class EnvironmentVariables implements IConfig {
 
   @IsNotEmpty()
   DATABASE_URL: string;
+
+  @IsNotEmpty()
+  MAILER_HOST: string;
+
+  @IsNotEmpty()
+  MAILER_PORT: number;
+
+  @IsNotEmpty()
+  MAILER_PASS: string;
+
+  @IsNotEmpty()
+  MAILER_USER: string;
+
+  @IsNotEmpty()
+  MAILER_FROM: string;
+
+  @IsNotEmpty()
+  OTP_EXPIRE: number;
 }
 
 export function validate(config: Record<string, unknown>) {

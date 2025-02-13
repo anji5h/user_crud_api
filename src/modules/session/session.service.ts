@@ -28,8 +28,18 @@ export class SessionService {
 
   async createSessionAsync(userId: number, device: string, expiresAt: Date) {
     const id = nanoid(32);
-    const session = await this.dbService.session.create({
-      data: {
+    const session = await this.dbService.session.upsert({
+      where: {
+        userId_device: {
+          userId,
+          device,
+        },
+      },
+      update: {
+        id,
+        expiresAt,
+      },
+      create: {
         id,
         userId,
         device,

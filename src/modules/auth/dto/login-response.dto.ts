@@ -13,6 +13,9 @@ class User {
 
   @ApiProperty()
   role: string;
+
+  @ApiProperty()
+  isVerified: boolean;
 }
 
 class LoginResponse {

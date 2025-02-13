@@ -15,4 +15,10 @@ export interface IConfig {
   TOKEN_EXPIRE: number;
   SESSION_EXPIRE: number;
   DATABASE_URL: string;
+  MAILER_HOST: string;
+  MAILER_PORT: number;
+  MAILER_USER: string;
+  MAILER_PASS: string;
+  MAILER_FROM: string;
+  OTP_EXPIRE: number
 }

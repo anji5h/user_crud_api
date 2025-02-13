@@ -2,12 +2,19 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
 import { HashModule } from '../hash/hash.module';
 import { RoleModule } from '../role/role.module';
-import { SessionModule } from '../token/session.module';
+import { SessionModule } from '../session/session.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
-  imports: [HashModule, DatabaseModule, SessionModule, RoleModule],
+  imports: [
+    HashModule,
+    DatabaseModule,
+    SessionModule,
+    RoleModule,
+    MailerModule,
+  ],
   providers: [AuthService],
   controllers: [AuthController],
 })

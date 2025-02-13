@@ -8,12 +8,13 @@ import { HashModule } from './modules/hash/hash.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { JwtModule } from '@nestjs/jwt';
-import { SessionModule } from './modules/token/session.module';
+import { SessionModule } from './modules/session/session.module';
 import { IConfig } from './common/types/config.type';
 import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 import { RoleGuard } from './common/guards/role.guard';
 import { AuthGuard } from './common/guards/auth.guard';
+import { MailerModule } from './modules/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuthGuard } from './common/guards/auth.guard';
     SessionModule,
     RoleModule,
     UserModule,
+    MailerModule,
   ],
   controllers: [],
   providers: [

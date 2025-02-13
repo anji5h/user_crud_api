@@ -12,9 +12,10 @@ import { IResult } from 'ua-parser-js';
 import { DatabaseService } from '../database/database.service';
 import { HashService } from '../hash/hash.service';
 import { RoleService } from '../role/role.service';
-import { SessionService } from '../token/session.service';
+import { SessionService } from '../session/session.service';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { RegisterRequestDto } from './dto/register-request.dto';
+import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
     private readonly roleService: RoleService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<IConfig>,
+    private readonly mailerService: MailerService,
   ) {}
 
   async registerAsync(registerDto: RegisterRequestDto) {
@@ -36,14 +38,27 @@ export class AuthService {
 
     if (!userRole) throw new BadRequestException('REGISTRATION FAILED');
 
-    await this.dbService.user.create({
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otpExpireAt = new Date(
+      Date.now() + this.configService.get('OTP_EXPIRE') * 1000,
+    );
+
+    const user = await this.dbService.user.create({
       data: {
         name: registerDto.name,
         password: hashedPassword,
         email: registerDto.email,
         roleId: userRole?.id,
+        otp,
+        otpExpireAt,
       },
     });
+
+    await this.mailerService.sendVerificationMailAsync(
+      user.name,
+      user.email,
+      otp,
+    );
   }
 
   async loginAsync(loginDto: LoginRequestDto, userAgent: IResult) {
@@ -95,6 +110,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role.name,
+        isVerified: !!user.verifiedAt,
       },
       token,
       sessionId,
