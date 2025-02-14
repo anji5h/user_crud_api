@@ -61,8 +61,10 @@ export class AuthController {
     const response = new TokenResponseDto();
     response.message = 'SUCCESS';
     response.statusCode = 200;
-    response.data.token = token;
+    response.data = {
+      token,
+    };
 
-    return token;
+    return response;
   }
 }

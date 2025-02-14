@@ -3,11 +3,11 @@ import { scrypt, randomBytes } from 'crypto';
 
 @Injectable()
 export class HashService {
-  private readonly keyLength = 64;
+  private readonly keyLength = 32;
 
   constructor() {}
 
-  async hashPassword(password: string) {
+  async createHash(password: string) {
     const salt = randomBytes(16).toString('hex');
 
     const derivedKey: Buffer = await new Promise((resolve, reject) => {
@@ -20,7 +20,7 @@ export class HashService {
     return `${salt}:${derivedKey.toString('hex')}`;
   }
 
-  async verifyPassword(password: string, hash: string) {
+  async verifyHash(password: string, hash: string) {
     const [salt, key] = hash.split(':');
 
     const derivedKey: Buffer = await new Promise((resolve, reject) => {

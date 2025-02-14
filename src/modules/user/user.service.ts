@@ -27,7 +27,7 @@ export class UserService {
   ) {}
 
   async createUserAsync(userCreateDto: UserCreateRequestDto) {
-    const hashedPassword = await this.hashService.hashPassword(
+    const hashedPassword = await this.hashService.createHash(
       userCreateDto.password,
     );
 
@@ -57,9 +57,33 @@ export class UserService {
     }
   }
 
-  async getUserAsync(where: Prisma.UserWhereUniqueInput) {
+  async verifyCredentialsAsync(email: string, password: string) {
     const user = await this.dbService.user.findUnique({
-      where,
+      where: {
+        email,
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    if (!user) return null;
+
+    const isPasswordCorrect = this.hashService.verifyHash(
+      password,
+      user.password,
+    );
+
+    if (!isPasswordCorrect) return null;
+
+    return user;
+  }
+
+  async getUserAsync(id: number) {
+    const user = await this.dbService.user.findUnique({
+      where: {
+        id,
+      },
       include: {
         role: true,
       },

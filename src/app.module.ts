@@ -45,8 +45,8 @@ import { MailerModule } from './modules/mailer/mailer.module';
   ],
   controllers: [],
   providers: [
-    { provide: APP_GUARD, useClass: RoleGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: RoleGuard },
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,

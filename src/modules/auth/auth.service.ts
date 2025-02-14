@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -8,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import { IConfig } from 'src/common/types/config.type';
 import { IJwtPayload } from 'src/common/types/jwt-payload.type';
 import { IResult } from 'ua-parser-js';
-import { HashService } from '../hash/hash.service';
 import { SessionService } from '../session/session.service';
 import { UserService } from '../user/user.service';
 import { LoginRequestDto } from './dto/login-request.dto';
@@ -16,7 +16,6 @@ import { LoginRequestDto } from './dto/login-request.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly hashService: HashService,
     private readonly sessionService: SessionService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<IConfig>,
@@ -24,24 +23,16 @@ export class AuthService {
   ) {}
 
   async loginAsync(loginDto: LoginRequestDto, userAgent: IResult) {
-    const user = await this.userService.getUserAsync({
-      email: loginDto.email,
-    });
-
-    if (!user) throw new UnauthorizedException('Invalid email or password');
-
-    if (user.isBanned)
-      throw new ForbiddenException(
-        'Your account is suspended. Please contact the admin.',
-      );
-
-    const isPasswordVerified = await this.hashService.verifyPassword(
+    const user = await this.userService.verifyCredentialsAsync(
+      loginDto.email,
       loginDto.password,
-      user.password,
     );
 
-    if (!isPasswordVerified)
-      throw new UnauthorizedException('Invalid email or password');
+    if (!user)
+      throw new UnauthorizedException('AUTH_ERROR: INVALID CREDENTIALS');
+
+    if (user.isBanned)
+      throw new ForbiddenException('AUTH_ERROR: ACCOUNT SUSPENDED');
 
     const userDevice = this.getUserDevice(userAgent);
 
@@ -76,6 +67,10 @@ export class AuthService {
   }
 
   async refreshJwtTokenAsync(sessionId: string) {
+    if (!sessionId) {
+      throw new BadRequestException('TOKEN_REFRESH_FAILED: MISSING SESSION ID');
+    }
+
     const session = await this.sessionService.getSessionAsync(sessionId);
 
     if (!session) {
@@ -106,6 +101,6 @@ export class AuthService {
   }
 
   private getUserDevice(userAgent: IResult) {
-    return `${userAgent.device?.model || userAgent.os?.name || 'unknown'}|${userAgent.browser?.name}`;
+    return `${userAgent.device?.model || userAgent.os?.name || 'unknown'}|${userAgent.browser?.name || 'unknown'}`;
   }
 }

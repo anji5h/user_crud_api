@@ -7,6 +7,8 @@ export class Token {
 }
 
 export class TokenResponseDto extends ResponseDto<Token> {
-  @ApiProperty()
+  @ApiProperty({
+    type: Token,
+  })
   data: Token;
 }

@@ -7,7 +7,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import {
   UserCreateRequestDto,
   UserCreateResponseDto,
@@ -21,6 +21,7 @@ import {
   VerifyEmailRepsonseDto,
 } from './dto/user-verify.dto';
 
+@ApiBearerAuth("JWT")
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

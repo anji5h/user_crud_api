@@ -13,10 +13,6 @@ export class SessionService {
       },
       include: {
         user: {
-          select: {
-            id: true,
-            roleId: true,
-          },
           include: {
             role: true,
           },

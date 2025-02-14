@@ -1,17 +1,15 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { Role } from 'src/common/decorators/role.decorator';
-import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesResponseDto } from './dto/role-response.dto';
 import { RoleService } from './role.service';
 
 @ApiBearerAuth('JWT')
-@UseGuards(AuthGuard)
-@Role('admin')
 @Controller('role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
   @Get()
+  @Role('admin')
   @ApiResponse({
     type: RolesResponseDto,
   })
