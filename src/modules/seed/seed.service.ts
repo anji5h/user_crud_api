@@ -15,41 +15,48 @@ export class SeedService {
   ) {}
 
   async run() {
-    await this.dbService.role.createMany({
-      data: [{ name: 'admin' }, { name: 'user' }],
-      skipDuplicates: true,
-    });
+    try {
+      await this.dbService.role.createMany({
+        data: [{ name: 'admin' }, { name: 'user' }],
+        skipDuplicates: true,
+      });
 
-    const adminRole = await this.dbService.role.findUnique({
-      where: {
-        name: 'admin',
-      },
-    });
+      const adminRole = await this.dbService.role.findUnique({
+        where: {
+          name: 'admin',
+        },
+      });
 
-    if (!adminRole) return;
+      if (!adminRole) return;
 
-    const adminUser = await this.dbService.user.findFirst({
-      where: {
-        roleId: adminRole?.id,
-      },
-    });
+      const adminUser = await this.dbService.user.findFirst({
+        where: {
+          roleId: adminRole.id,
+        },
+        select: {
+          id: true,
+        },
+      });
 
-    if (adminUser) return;
+      if (!!adminUser) return;
 
-    const hashedPassword = await this.hashService.hashPassword(
-      this.configService.get<string>('ADMIN_PASSWORD') ?? '',
-    );
+      const hashedPassword = await this.hashService.createHash(
+        this.configService.get('ADMIN_PASSWORD') ?? '',
+      );
 
-    await this.dbService.user.create({
-      data: {
-        name: this.configService.get<string>('ADMIN_NAME') ?? '',
-        email: this.configService.get<string>('ADMIN_EMAIL') ?? '',
-        password: hashedPassword,
-        roleId: adminRole?.id,
-        verifiedAt: new Date(),
-      },
-    });
-
-    this.logger.verbose('Database seeded.');
+      await this.dbService.user.create({
+        data: {
+          name: this.configService.get('ADMIN_NAME') ?? '',
+          email: this.configService.get('ADMIN_EMAIL') ?? '',
+          password: hashedPassword,
+          roleId: adminRole?.id,
+          verifiedAt: new Date(),
+        },
+      });
+    } catch (error) {
+      this.logger.error(error?.message);
+    } finally {
+      this.logger.verbose('Database seeded.');
+    }
   }
 }
