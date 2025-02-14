@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { Role } from 'src/common/decorators/role.decorator';
 
 @Injectable()
-@Role('user')
+@Role('admin')
 export class RoleService {
   constructor(private readonly dbService: DatabaseService) {}
 
@@ -38,7 +38,7 @@ export class RoleService {
   }
 
   async updateRoleAsync(id: number, name: string) {
-    const roleUpdated = await this.dbService.role.update({
+    await this.dbService.role.update({
       where: {
         id,
       },

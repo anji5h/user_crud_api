@@ -5,16 +5,10 @@ import { RoleModule } from '../role/role.module';
 import { SessionModule } from '../session/session.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { MailerModule } from '../mailer/mailer.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [
-    HashModule,
-    DatabaseModule,
-    SessionModule,
-    RoleModule,
-    MailerModule,
-  ],
+  imports: [HashModule, DatabaseModule, SessionModule, RoleModule, UserModule],
   providers: [AuthService],
   controllers: [AuthController],
 })

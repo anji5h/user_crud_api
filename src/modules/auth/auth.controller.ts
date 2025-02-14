@@ -1,21 +1,22 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
   Res,
 } from '@nestjs/common';
-import { LoginRequestDto } from './dto/login-request.dto';
-import { AuthService } from './auth.service';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { CookieOptions, Response } from 'express';
-import { RegisterRequestDto } from './dto/register-request.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
-import { UAParser } from 'ua-parser-js';
+import { Request, Response } from 'express';
 import { Public } from 'src/common/decorators/public.decorator';
+import { UAParser } from 'ua-parser-js';
+import { AuthService } from './auth.service';
+import { LoginRequestDto } from './dto/login-request.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { request } from 'http';
+import { TokenResponseDto } from './dto/token-response.dto';
 
 @Public()
 @Controller('auth')
@@ -48,15 +49,20 @@ export class AuthController {
       });
   }
 
-  @Post('register')
-  @HttpCode(200)
-  @ApiBody({ type: RegisterRequestDto })
-  @ApiResponse({ type: RegisterResponseDto })
-  async registerAsync(@Body() registerDto: RegisterRequestDto) {
-    await this.authService.registerAsync(registerDto);
+  @Get('token')
+  @ApiResponse({
+    type: TokenResponseDto,
+  })
+  async refreshJwtTokenAsync(@Req() request: Request) {
+    const token = await this.authService.refreshJwtTokenAsync(
+      request.cookies['session_id'],
+    );
 
-    const response = new RegisterResponseDto();
-    response.statusCode = 201;
+    const response = new TokenResponseDto();
     response.message = 'SUCCESS';
+    response.statusCode = 200;
+    response.data.token = token;
+
+    return token;
   }
 }

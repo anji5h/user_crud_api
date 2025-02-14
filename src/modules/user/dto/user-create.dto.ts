@@ -8,8 +8,9 @@ import {
   Length,
   Matches,
 } from 'class-validator';
+import { ResponseDto } from 'src/common/dto/response.dto';
 
-export class RegisterRequestDto {
+export class UserCreateRequestDto {
   @ApiProperty()
   @Transform(({ value }) => value?.trim().toLowerCase())
   @IsString()
@@ -24,7 +25,15 @@ export class RegisterRequestDto {
   email: string;
 
   @ApiProperty()
-  @IsStrongPassword()
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  })
   @IsNotEmpty()
   password: string;
 }
+
+export class UserCreateResponseDto extends ResponseDto<null> {}

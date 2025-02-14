@@ -3,6 +3,9 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SeedService } from './modules/seed/seed.service';
 import { ConsoleLogger } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
+import { IJwtPayload } from './common/types/jwt-payload.type';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -30,6 +33,8 @@ async function bootstrap() {
   SwaggerModule.setup(`${apiPath}/docs`, app, documentFactory);
 
   app.setGlobalPrefix(apiPath);
+
+  app.use(cookieParser());
 
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }

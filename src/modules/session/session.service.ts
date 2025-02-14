@@ -6,6 +6,27 @@ import { nanoid } from 'nanoid';
 export class SessionService {
   constructor(private readonly dbService: DatabaseService) {}
 
+  async getSessionAsync(id: string) {
+    const session = await this.dbService.session.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            roleId: true,
+          },
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    return session;
+  }
+
   async getSessionsAsync() {
     const sessions = await this.dbService.session.findMany({
       where: {
@@ -48,5 +69,13 @@ export class SessionService {
     });
 
     return session.id;
+  }
+
+  async deleteSessionAsync(id: string) {
+    await this.dbService.session.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

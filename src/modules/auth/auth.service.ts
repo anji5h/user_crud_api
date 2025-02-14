@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -9,66 +8,24 @@ import { JwtService } from '@nestjs/jwt';
 import { IConfig } from 'src/common/types/config.type';
 import { IJwtPayload } from 'src/common/types/jwt-payload.type';
 import { IResult } from 'ua-parser-js';
-import { DatabaseService } from '../database/database.service';
 import { HashService } from '../hash/hash.service';
-import { RoleService } from '../role/role.service';
 import { SessionService } from '../session/session.service';
+import { UserService } from '../user/user.service';
 import { LoginRequestDto } from './dto/login-request.dto';
-import { RegisterRequestDto } from './dto/register-request.dto';
-import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly hashService: HashService,
-    private readonly dbService: DatabaseService,
     private readonly sessionService: SessionService,
-    private readonly roleService: RoleService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<IConfig>,
-    private readonly mailerService: MailerService,
+    private readonly userService: UserService,
   ) {}
 
-  async registerAsync(registerDto: RegisterRequestDto) {
-    const hashedPassword = await this.hashService.hashPassword(
-      registerDto.password,
-    );
-
-    const userRole = await this.roleService.getRoleAsync('user');
-
-    if (!userRole) throw new BadRequestException('REGISTRATION FAILED');
-
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const otpExpireAt = new Date(
-      Date.now() + this.configService.get('OTP_EXPIRE') * 1000,
-    );
-
-    const user = await this.dbService.user.create({
-      data: {
-        name: registerDto.name,
-        password: hashedPassword,
-        email: registerDto.email,
-        roleId: userRole?.id,
-        otp,
-        otpExpireAt,
-      },
-    });
-
-    await this.mailerService.sendVerificationMailAsync(
-      user.name,
-      user.email,
-      otp,
-    );
-  }
-
   async loginAsync(loginDto: LoginRequestDto, userAgent: IResult) {
-    const user = await this.dbService.user.findUnique({
-      where: {
-        email: loginDto.email,
-      },
-      include: {
-        role: true,
-      },
+    const user = await this.userService.getUserAsync({
+      email: loginDto.email,
     });
 
     if (!user) throw new UnauthorizedException('Invalid email or password');
@@ -116,6 +73,28 @@ export class AuthService {
       sessionId,
       sessionExpiresAt,
     };
+  }
+
+  async refreshJwtTokenAsync(sessionId: string) {
+    const session = await this.sessionService.getSessionAsync(sessionId);
+
+    if (!session) {
+      throw new UnauthorizedException(
+        'TOKEN_REFRESH_FAILED: SESSION NOT FOUND',
+      );
+    }
+
+    if (session.expiresAt < new Date()) {
+      throw new UnauthorizedException('TOKEN_REFRESH_FAILED: SESSION EXPIRED');
+    }
+
+    const token = await this.createJwtTokenAsync({
+      userId: session.userId,
+      sessionId: session.id,
+      userRole: session.user.role.name,
+    });
+
+    return token;
   }
 
   private async createJwtTokenAsync(payload: IJwtPayload) {
